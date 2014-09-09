@@ -19,6 +19,7 @@ public class EchoServer {
   private static ServerSocket serverSocket;
   private static final Properties properties = Utils.initProperties("server.properties");
  
+ 
 
   public static void stopServer() {
     keepRunning = false;
@@ -55,6 +56,8 @@ public class EchoServer {
       } while (keepRunning);
     } catch (IOException ex) {
       Logger.getLogger(EchoServer.class.getName()).log(Level.SEVERE, null, ex);
+    } finally{
+        Utils.closeLogger(EchoServer.class.getName());
     }
   }
 }
