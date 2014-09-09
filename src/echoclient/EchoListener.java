@@ -1,8 +1,8 @@
-
 package echoclient;
 
-public interface EchoListener {
-    
+public interface EchoListener
+{
+
     void messageArrived(String data);
-    
+
 }
