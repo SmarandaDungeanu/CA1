@@ -25,26 +25,32 @@ public class ClientHandler extends Thread
     PrintWriter writer;
     Socket socket;
     private String name;
+    boolean isActive;
 
     public ClientHandler(Socket socket) throws IOException
     {
         input = new Scanner(socket.getInputStream());
         writer = new PrintWriter(socket.getOutputStream(), true);
         this.socket = socket;
+        isActive = true;
     }
 
     @Override
     public void run()
     {
-        String message = input.nextLine(); //IMPORTANT blocking call
-        Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
-        while (!message.equals(ProtocolStrings.STOP))
+        String message;
+//        String message = input.nextLine(); //IMPORTANT blocking call
+//        Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
+////        while(!message.equals(ProtocolStrings.STOP))
+        while (isActive)
         {
-            decode(message);
-            Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message.toUpperCase()));
             message = input.nextLine(); //IMPORTANT blocking call
+            Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message.toUpperCase()));
+            decode(message);
+
+            // message = input.nextLine(); //IMPORTANT blocking call
         }
-        writer.println(ProtocolStrings.STOP);//Echo the stop message back to the client for a nice closedown
+        //writer.println(ProtocolStrings.STOP);//Echo the stop message back to the client for a nice closedown
         try
         {
             socket.close();
@@ -79,30 +85,45 @@ public class ClientHandler extends Thread
         {
             case ProtocolStrings.CONNECT:
                 //write back the list of users send("ONLINE#Marek,Smara","*")
-                name = msgParts[1];
-                //ch.setClientName(msgParts[1]);
-                EchoServer.addHandler(this);
-                EchoServer.send(ProtocolStrings.ONLINE, new String[]
+                //message must have a name after the connect
+                if (msgParts.length > 1)
                 {
-                    ProtocolStrings.EVERYBODY
-                });
+                    name = msgParts[1];
+                    //ch.setClientName(msgParts[1]);
+                    EchoServer.addHandler(this);
+                    EchoServer.send(ProtocolStrings.ONLINE, new String[]
+                    {
+                        ProtocolStrings.EVERYBODY
+                    });
+                }
                 break;
             case ProtocolStrings.SEND:
+                //message must contain the names of recipients and also the message
+                 if (msgParts.length > 2)
+                {
                 String[] recipients = msgParts[1].split(",");
-               String message = ProtocolStrings.MESSAGE+ProtocolStrings.DIVIDER + msgParts[1] + ProtocolStrings.DIVIDER+msgParts[2];
+                String message = ProtocolStrings.MESSAGE + ProtocolStrings.DIVIDER + msgParts[1] + ProtocolStrings.DIVIDER + msgParts[2];
                 EchoServer.send(message, recipients);
                 break;
+                }
             case ProtocolStrings.CLOSE:
-                EchoServer.removeHandler(this);
-                EchoServer.send(ProtocolStrings.CLOSE, new String[]
+                //message must be ended with a #
+                if (msg.equals(ProtocolStrings.STOP))
                 {
-                    name
-                });
-                //in the case that somebody disconects, the message with the new list will be sent out
-                EchoServer.send(ProtocolStrings.ONLINE, new String[]
-                {
-                    ProtocolStrings.EVERYBODY
-                });
+                    isActive = false;
+                    //send a remove statement to the caller
+                    EchoServer.send(ProtocolStrings.CLOSE, new String[]
+                    {
+                        name
+                    });
+                    //remove him from the clienthandlers in server
+                    EchoServer.removeHandler(this);
+                    //after user disconects, the message with the new ONLINE user list will be sent out to others
+                    EchoServer.send(ProtocolStrings.ONLINE, new String[]
+                    {
+                        ProtocolStrings.EVERYBODY
+                    });
+                }
                 break;
             default:
                 break;

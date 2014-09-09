@@ -12,7 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import shared.ProtocolStrings;
 
-public class EchoClient extends Thread {
+public class EchoClient extends Thread
+{
 
     Socket socket;
     private int port;
@@ -21,7 +22,8 @@ public class EchoClient extends Thread {
     private PrintWriter output;
     private List<EchoListener> listeners = new ArrayList();
 
-    public void connect(String address, int port) throws UnknownHostException, IOException {
+    public void connect(String address, int port) throws UnknownHostException, IOException
+    {
         this.port = port;
         serverAddress = InetAddress.getByName(address);
         socket = new Socket(serverAddress, port);
@@ -30,45 +32,54 @@ public class EchoClient extends Thread {
         start();
     }
 
-    public void send(String msg) {
+    public void send(String msg)
+    {
         output.println(msg);
     }
 
-    public void closeTheConnection() throws IOException {
+    public void closeTheConnection() throws IOException
+    {
         output.println(ProtocolStrings.CLOSE);
     }
-    
+
     @Override
-    public void run() {
+    public void run()
+    {
         String msg = input.nextLine();
-        while (!msg.equals(ProtocolStrings.STOP)) {
+        while (!msg.equals(ProtocolStrings.STOP))
+        {
             notifyListeners(msg);
             msg = input.nextLine();
         }
-        try {
+        try
+        {
             socket.close();
-        } catch (IOException ex) {
+        } catch (IOException ex)
+        {
             Logger.getLogger(EchoClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void registerEchoListener(EchoListener l) {
+    public void registerEchoListener(EchoListener l)
+    {
         listeners.add(l);
     }
 
-    public void unRegisterEchoListener(EchoListener l) {
+    public void unRegisterEchoListener(EchoListener l)
+    {
         listeners.remove(l);
     }
 
-    private void notifyListeners(String msg) {
-        for (EchoListener l : listeners) {
+    private void notifyListeners(String msg)
+    {
+        for (EchoListener l : listeners)
+        {
             l.messageArrived(msg);
         }
     }
-    
-    
-    
-    public static void main(String[] args) {
+
+    public static void main(String[] args)
+    {
 //        int port = 9090;
 //        String ip = "localhost";
 //        if (args.length == 2) {
@@ -92,8 +103,5 @@ public class EchoClient extends Thread {
 //            Logger.getLogger(EchoClient.class.getName()).log(Level.SEVERE, null, ex);
 //        }
     }
-
-    
-   
 
 }
