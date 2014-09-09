@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import quicktime.app.spaces.Protocol;
 import shared.ProtocolStrings;
 
 public class EchoClient extends Thread {
@@ -34,8 +35,8 @@ public class EchoClient extends Thread {
         output.println(msg);
     }
 
-    public void stopIt() throws IOException {
-        output.println(ProtocolStrings.STOP);
+    public void closeTheConnection() throws IOException {
+        output.println(ProtocolStrings.CLOSE);
     }
     
     @Override

@@ -5,6 +5,7 @@
  */
 package echoserver;
 
+import static echoserver.EchoServer.addHandler;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -22,7 +23,7 @@ public class ClientHandler extends Thread {
     Scanner input;
     PrintWriter writer;
     Socket socket;
-    String name;
+    private String name;
 
     public ClientHandler(Socket socket) throws IOException {
         input = new Scanner(socket.getInputStream());
@@ -35,7 +36,7 @@ public class ClientHandler extends Thread {
         String message = input.nextLine(); //IMPORTANT blocking call
         Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
         while (!message.equals(ProtocolStrings.STOP)) {
-            writer.println(message.toUpperCase());
+            decode(message);
             Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message.toUpperCase()));
             message = input.nextLine(); //IMPORTANT blocking call
         }
@@ -53,8 +54,34 @@ public class ClientHandler extends Thread {
         return name;
     }
     
+    public void setClientName(String name)
+    {
+        this.name = name;
+    }
+    
     public void send (String msg)
     {
         writer.println(msg);
     }
+    
+     public void decode (String msg)
+    {
+        String[] msgParts = msg.split("\\#");
+        String command = msgParts[0];
+        switch (command){
+            case ProtocolStrings.CONNECT:
+                //write back the list of users send("ONLINE#Marek,Smara","*")
+                name = msgParts[1];
+//                ch.setClientName(msgParts[1]);
+                EchoServer.addHandler(this);
+                break;
+            case ProtocolStrings.SEND:
+                break;
+            case ProtocolStrings.CLOSE:
+                break;
+            default:
+                break;
+        }
+    }
+    
 }

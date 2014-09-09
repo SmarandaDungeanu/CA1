@@ -32,18 +32,21 @@ public class EchoServer {
   public static void addHandler(ClientHandler ch)
   {
       clientHandlers.put(ch.getClientName(), ch);
-      ch.start();
+//      ch.start();
+      
   }
   
   public static void stopServer() {
     keepRunning = false;
   }
   
-  public static void send(String msg)
+   
+    
+  public static void send(String msg, String[] recipients)
   {
       for(Map.Entry<String, ClientHandler> ch : clientHandlers.entrySet())
       {
-          ch.getValue().send(msg.toUpperCase());
+          ch.getValue().send(msg);
       }
   }
 
@@ -59,7 +62,8 @@ public class EchoServer {
         Socket socket = serverSocket.accept(); //Important Blocking call
         Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Connected to a client");    
         ClientHandler ch = new ClientHandler(socket);
-        addHandler(ch);
+//        addHandler(ch);
+        ch.start();
       } while (keepRunning);
     } catch (IOException ex) {
       Logger.getLogger(EchoServer.class.getName()).log(Level.SEVERE, null, ex);
