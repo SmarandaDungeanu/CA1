@@ -61,6 +61,7 @@ public class ClientHandler extends Thread {
     
     public void send (String msg)
     {
+        
         writer.println(msg);
     }
     
@@ -72,12 +73,15 @@ public class ClientHandler extends Thread {
             case ProtocolStrings.CONNECT:
                 //write back the list of users send("ONLINE#Marek,Smara","*")
                 name = msgParts[1];
-//                ch.setClientName(msgParts[1]);
+                //ch.setClientName(msgParts[1]);
                 EchoServer.addHandler(this);
+                EchoServer.send(ProtocolStrings.ONLINE, new String[]{ProtocolStrings.EVERYBODY});
                 break;
             case ProtocolStrings.SEND:
                 break;
             case ProtocolStrings.CLOSE:
+                EchoServer.removeHandler(this);
+                EchoServer.send(ProtocolStrings.CLOSE, new String[]{name});
                 break;
             default:
                 break;
