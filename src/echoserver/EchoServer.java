@@ -18,27 +18,12 @@ public class EchoServer {
   private static boolean keepRunning = true;
   private static ServerSocket serverSocket;
   private static final Properties properties = Utils.initProperties("server.properties");
+  private static ClientHandler clientHandler;
  
  
 
   public static void stopServer() {
     keepRunning = false;
-  }
-
-  private static void handleClient(Socket socket) throws IOException {
-    Scanner input = new Scanner(socket.getInputStream());
-    PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-
-    String message = input.nextLine(); //IMPORTANT blocking call
-    Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ",message));
-    while (!message.equals(ProtocolStrings.STOP)) {
-      writer.println(message.toUpperCase());
-      Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ",message.toUpperCase()));
-      message = input.nextLine(); //IMPORTANT blocking call
-    }
-    writer.println(ProtocolStrings.STOP);//Echo the stop message back to the client for a nice closedown
-    socket.close();
-    Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Closed a Connection");
   }
 
   public static void main(String[] args) {
@@ -51,8 +36,9 @@ public class EchoServer {
       serverSocket.bind(new InetSocketAddress(ip, port));
       do {
         Socket socket = serverSocket.accept(); //Important Blocking call
-        Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Connected to a client");        
-        handleClient(socket);
+        Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Connected to a client");    
+        clientHandler = new ClientHandler(socket);
+        clientHandler.start();
       } while (keepRunning);
     } catch (IOException ex) {
       Logger.getLogger(EchoServer.class.getName()).log(Level.SEVERE, null, ex);
