@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -18,12 +20,31 @@ public class EchoServer {
   private static boolean keepRunning = true;
   private static ServerSocket serverSocket;
   private static final Properties properties = Utils.initProperties("server.properties");
-  private static ClientHandler clientHandler;
+  private static Map<String, ClientHandler> clientHandlers;
  
  
 
+  public static void removeHandler(ClientHandler ch)
+  {
+      clientHandlers.remove(ch.getClientName());
+  }
+  
+  public static void addHandler(ClientHandler ch)
+  {
+      clientHandlers.put(ch.getClientName(), ch);
+      ch.start();
+  }
+  
   public static void stopServer() {
     keepRunning = false;
+  }
+  
+  public static void send(String msg)
+  {
+      for(Map.Entry<String, ClientHandler> ch : clientHandlers.entrySet())
+      {
+          ch.getValue().send(msg.toUpperCase());
+      }
   }
 
   public static void main(String[] args) {
@@ -37,8 +58,8 @@ public class EchoServer {
       do {
         Socket socket = serverSocket.accept(); //Important Blocking call
         Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Connected to a client");    
-        clientHandler = new ClientHandler(socket);
-        clientHandler.start();
+        ClientHandler ch = new ClientHandler(socket);
+        addHandler(ch);
       } while (keepRunning);
     } catch (IOException ex) {
       Logger.getLogger(EchoServer.class.getName()).log(Level.SEVERE, null, ex);

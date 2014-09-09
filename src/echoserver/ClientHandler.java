@@ -22,6 +22,7 @@ public class ClientHandler extends Thread {
     Scanner input;
     PrintWriter writer;
     Socket socket;
+    String name;
 
     public ClientHandler(Socket socket) throws IOException {
         input = new Scanner(socket.getInputStream());
@@ -47,4 +48,13 @@ public class ClientHandler extends Thread {
         Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Closed a Connection");
     }
 
+    public String getClientName()
+    {
+        return name;
+    }
+    
+    public void send (String msg)
+    {
+        writer.println(msg);
+    }
 }
