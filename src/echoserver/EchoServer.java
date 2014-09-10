@@ -1,34 +1,27 @@
-package chatserver;
+package echoserver;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shared.ProtocolStrings;
 import utils.Utils;
 
-public class ChatServer
+public class EchoServer
 {
 
-    private static ChatServer instance;
     private static boolean keepRunning = true;
     private static ServerSocket serverSocket;
     private static final Properties properties = Utils.initProperties("server.properties");
     private static HashMap<String, ClientHandler> clientHandlers;
-
-    public static ChatServer getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new ChatServer();
-        }
-        return instance;
-    }
 
     public static void removeHandler(ClientHandler ch)
     {
@@ -38,7 +31,6 @@ public class ChatServer
     public static void addHandler(ClientHandler ch)
     {
         clientHandlers.put(ch.getClientName(), ch);
-        System.out.println(getNbOfConnectedUsers());
 //        ch.start();
     }
 
@@ -68,14 +60,14 @@ public class ChatServer
 
                 break;
             case ProtocolStrings.MESSAGE:
-                //in case the message is sent to everybody the sender should not get it back - we exclude him from the list of recipients
-                msg = msg + ProtocolStrings.DIVIDER;
-                for (String s : recipients)
-                {
-                    msg = msg + s + ",";
-                }
-                //At the end the last person will have a comma after his name so we just have to remove it
-                msg = msg.substring(0, msg.length() - 1);
+                //in case the client wants to send the message we must find out who the messae is going to and then we need to add them and the text to the message
+//                msg = msg + ProtocolStrings.DIVIDER;
+//                for(String s:recipients)
+//                {
+//                    msg = msg + s + ",";
+//                }
+//                //At the end the last person will have a comma after his name so we just have to remove it
+//                msg = msg.substring(0, msg.length() - 1);
                 break;
             case ProtocolStrings.CLOSE:
                 msg = msg + ProtocolStrings.DIVIDER;
@@ -89,20 +81,9 @@ public class ChatServer
         {
             for (Map.Entry<String, ClientHandler> ch : clientHandlers.entrySet())
             {
-                if (command.equals(ProtocolStrings.MESSAGE))
-                {
-                    if (!ch.getKey().equals(msgParts[1]))
-                    {
-                        ch.getValue().send(msg);
-                    }
-                }
-                else
-                {
-                       ch.getValue().send(msg);
-                }
+                ch.getValue().send(msg);
             }
-        }
-        else
+        } else
         {
             for (String s : recipients)
             {
@@ -115,11 +96,7 @@ public class ChatServer
                 }
             }
         }
-    }
 
-    public static int getNbOfConnectedUsers()
-    {
-        return clientHandlers.size();
     }
 
     public static void main(String[] args)
@@ -127,7 +104,7 @@ public class ChatServer
         int port = Integer.parseInt(properties.getProperty("port"));
         String ip = properties.getProperty("serverIp");
         String logFile = properties.getProperty("logFile");
-        Logger.getLogger(ChatServer.class.getName()).log(Level.INFO, "Sever started");
+        Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Sever started");
         clientHandlers = new HashMap<String, ClientHandler>()
         {
         };
@@ -138,7 +115,7 @@ public class ChatServer
             do
             {
                 Socket socket = serverSocket.accept(); //Important Blocking call
-                Logger.getLogger(ChatServer.class.getName()).log(Level.INFO, "Connected to a client");
+                Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Connected to a client");
                 ClientHandler ch = new ClientHandler(socket);
 //                ch.setClientName("TestShit");
 //                addHandler(ch);
@@ -146,10 +123,10 @@ public class ChatServer
             } while (keepRunning);
         } catch (IOException ex)
         {
-            Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EchoServer.class.getName()).log(Level.SEVERE, null, ex);
         } finally
         {
-            Utils.closeLogger(ChatServer.class.getName());
+            Utils.closeLogger(EchoServer.class.getName());
         }
     }
 }

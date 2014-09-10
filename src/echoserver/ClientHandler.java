@@ -1,6 +1,11 @@
-package chatserver;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package echoserver;
 
-import static chatserver.ChatServer.getNbOfConnectedUsers;
+import static echoserver.EchoServer.send;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -35,12 +40,12 @@ public class ClientHandler extends Thread
     {
         String message;
 //        String message = input.nextLine(); //IMPORTANT blocking call
-//        Logger.getLogger(ChatServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
+//        Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
 ////        while(!message.equals(ProtocolStrings.STOP))
         while (isActive)
         {
             message = input.nextLine(); //IMPORTANT blocking call
-            Logger.getLogger(ChatServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message.toUpperCase()));
+            Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message.toUpperCase()));
             decode(message);
 
             // message = input.nextLine(); //IMPORTANT blocking call
@@ -53,7 +58,7 @@ public class ClientHandler extends Thread
         {
             Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Logger.getLogger(ChatServer.class.getName()).log(Level.INFO, "Closed a Connection");
+        Logger.getLogger(EchoServer.class.getName()).log(Level.INFO, "Closed a Connection");
     }
 
     public String getClientName()
@@ -68,6 +73,7 @@ public class ClientHandler extends Thread
 
     public void send(String msg)
     {
+
         writer.println(msg);
     }
 
@@ -84,8 +90,8 @@ public class ClientHandler extends Thread
                 {
                     name = msgParts[1];
                     //ch.setClientName(msgParts[1]);
-                    ChatServer.addHandler(this);
-                    ChatServer.send(ProtocolStrings.ONLINE, new String[]
+                    EchoServer.addHandler(this);
+                    EchoServer.send(ProtocolStrings.ONLINE, new String[]
                     {
                         ProtocolStrings.EVERYBODY
                     });
@@ -93,12 +99,12 @@ public class ClientHandler extends Thread
                 break;
             case ProtocolStrings.SEND:
                 //message must contain the names of recipients and also the message
-                if (msgParts.length > 2)
+                 if (msgParts.length > 2)
                 {
-                    String[] recipients = msgParts[1].split(",");
-                    String message = ProtocolStrings.MESSAGE + ProtocolStrings.DIVIDER + name + ProtocolStrings.DIVIDER + msgParts[2];
-                    ChatServer.send(message, recipients);
-                    break;
+                String[] recipients = msgParts[1].split(",");
+                String message = ProtocolStrings.MESSAGE + ProtocolStrings.DIVIDER + msgParts[1] + ProtocolStrings.DIVIDER + msgParts[2];
+                EchoServer.send(message, recipients);
+                break;
                 }
             case ProtocolStrings.CLOSE:
                 //message must be ended with a #
@@ -106,14 +112,14 @@ public class ClientHandler extends Thread
                 {
                     isActive = false;
                     //send a remove statement to the caller
-                    ChatServer.send(ProtocolStrings.CLOSE, new String[]
+                    EchoServer.send(ProtocolStrings.CLOSE, new String[]
                     {
                         name
                     });
                     //remove him from the clienthandlers in server
-                    ChatServer.removeHandler(this);
+                    EchoServer.removeHandler(this);
                     //after user disconects, the message with the new ONLINE user list will be sent out to others
-                    ChatServer.send(ProtocolStrings.ONLINE, new String[]
+                    EchoServer.send(ProtocolStrings.ONLINE, new String[]
                     {
                         ProtocolStrings.EVERYBODY
                     });
@@ -123,4 +129,5 @@ public class ClientHandler extends Thread
                 break;
         }
     }
+
 }
