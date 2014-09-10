@@ -1,4 +1,4 @@
-package echoclient;
+package chatclient;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,23 +12,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import shared.ProtocolStrings;
 
-public class EchoClient extends Thread
+public class ChatClient extends Thread
 {
 
-    Socket socket;
+    private Socket socket;
     private int port;
+    private String username;
     private InetAddress serverAddress;
     private Scanner input;
     private PrintWriter output;
-    private List<EchoListener> listeners = new ArrayList();
+    private List<MessageListener> listeners = new ArrayList();
 
-    public void connect(String address, int port) throws UnknownHostException, IOException
+    public void connect(String address, int port, String username) throws UnknownHostException, IOException
     {
+        this.username = username;
         this.port = port;
         serverAddress = InetAddress.getByName(address);
         socket = new Socket(serverAddress, port);
         input = new Scanner(socket.getInputStream());
         output = new PrintWriter(socket.getOutputStream(), true);  //Set to true, to get auto flush behaviour
+        send("CONNECT#" + username);
         start();
     }
 
@@ -56,23 +59,24 @@ public class EchoClient extends Thread
             socket.close();
         } catch (IOException ex)
         {
-            Logger.getLogger(EchoClient.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void registerEchoListener(EchoListener l)
+    public void registerEchoListener(MessageListener l)
     {
         listeners.add(l);
     }
 
-    public void unRegisterEchoListener(EchoListener l)
+    public void unRegisterEchoListener(MessageListener l)
     {
         listeners.remove(l);
+        send("CLOSE#");
     }
 
     private void notifyListeners(String msg)
     {
-        for (EchoListener l : listeners)
+        for (MessageListener l : listeners)
         {
             l.messageArrived(msg);
         }
@@ -87,7 +91,7 @@ public class EchoClient extends Thread
 //            ip = args[1];
 //        }
 //        try {
-//            EchoClient client = new EchoClient();
+//            ChatClient client = new ChatClient();
 //            View tester = new View();
 //            tester.setVisible(true);
 //            client.registerEchoListener(tester);
@@ -98,10 +102,9 @@ public class EchoClient extends Thread
 //            client.stopIt();
 //            //System.in.read();      
 //        } catch (UnknownHostException ex) {
-//            Logger.getLogger(EchoClient.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
 //        } catch (IOException ex) {
-//            Logger.getLogger(EchoClient.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
 //        }
     }
-
 }
