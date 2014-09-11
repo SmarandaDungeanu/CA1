@@ -95,14 +95,12 @@ public class ChatServer
                     {
                         ch.getValue().send(msg);
                     }
-                }
-                else
+                } else
                 {
-                       ch.getValue().send(msg);
+                    ch.getValue().send(msg);
                 }
             }
-        }
-        else
+        } else
         {
             for (String s : recipients)
             {
@@ -122,11 +120,13 @@ public class ChatServer
         return clientHandlers.size();
     }
 
-    public static void main(String[] args)
+    public void start()
     {
-        int port = Integer.parseInt(properties.getProperty("port"));
+        int port = Integer.parseInt(properties.getProperty("chatProgramPort"));
         String ip = properties.getProperty("serverIp");
         String logFile = properties.getProperty("logFile");
+        Utils.setLogFile(logFile, ChatServer.class.getName());
+        Logger logger = Utils.getLogger(logFile, ChatServer.class.getName());
         Logger.getLogger(ChatServer.class.getName()).log(Level.INFO, "Sever started");
         clientHandlers = new HashMap<String, ClientHandler>()
         {

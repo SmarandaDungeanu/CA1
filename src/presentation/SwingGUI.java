@@ -58,7 +58,7 @@ public class SwingGUI extends javax.swing.JFrame implements MessageListener
 
         portLabel.setText("Port");
 
-        portTextField.setText("9090");
+        portTextField.setText("9080");
 
         connectButton.setText("Connect");
         connectButton.addActionListener(new java.awt.event.ActionListener()
