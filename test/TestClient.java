@@ -1,11 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
-import echoclient.EchoClient;
-import echoserver.EchoServer;
+import chatclient.ChatClient;
+import chatserver.ChatServer;
 import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * @author Lars Mortensen
+ * @author smarandadungeanu
  */
 public class TestClient
 {
@@ -31,7 +26,7 @@ public class TestClient
             @Override
             public void run()
             {
-                EchoServer.main(null);
+                ChatServer.main(null);
             }
         }).start();
     }
@@ -39,7 +34,7 @@ public class TestClient
     @AfterClass
     public static void tearDownClass()
     {
-        EchoServer.stopServer();
+        ChatServer.stopServer();
     }
 
     @Before
@@ -50,8 +45,8 @@ public class TestClient
     @Test
     public void send() throws IOException
     {
-        EchoClient client = new EchoClient();
-        client.connect("localhost", 9090);
+        ChatClient client = new ChatClient();
+        client.connect("localhost", 9090, "randomName");
         client.send("Hello");
         //assertEquals("HELLO", client.receive());
     }
