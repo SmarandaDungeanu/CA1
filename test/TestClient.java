@@ -26,7 +26,7 @@ public class TestClient
             @Override
             public void run()
             {
-                ChatServer.main(null);
+               // ChatServer.start();
             }
         }).start();
     }
