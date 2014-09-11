@@ -22,7 +22,6 @@ public class ChatClient extends Thread
     private Scanner input;
     private PrintWriter output;
     private List<MessageListener> listeners = new ArrayList();
-    private boolean isActive;
 
     public void connect(String address, int port, String username) throws UnknownHostException, IOException
     {
@@ -33,7 +32,6 @@ public class ChatClient extends Thread
         input = new Scanner(socket.getInputStream());
         output = new PrintWriter(socket.getOutputStream(), true);  //Set to true, to get auto flush behaviour
         send("CONNECT#" + username);
-        isActive=true;
         start();
     }
 
