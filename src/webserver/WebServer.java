@@ -5,7 +5,11 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -17,26 +21,24 @@ import utils.Utils;
  *
  * @author Cristian
  */
-public class WebServer
-{
+public class WebServer {
 
-    private static ChatServer chatSV;
     static int port;
     static String ip;
 
-    public static void main(String[] args) throws IOException
-    {
-        chatSV = ChatServer.getInstance();
+    public static void main(String[] args) throws IOException {
+
         Properties properties = Utils.initProperties("server.properties");
         ip = properties.getProperty("serverIp");
 //        port = Integer.parseInt(properties.getProperty("port"));
-        port = 80;
+        port = 9080;
 //        String logFile = properties.getProperty("logFile");
 
 //        InetSocketAddress i = new InetSocketAddress("127.0.0.1", 8080);
         InetSocketAddress i = new InetSocketAddress(ip, port);
         HttpServer server = HttpServer.create(i, 0);
-        server.createContext("/welcome", new WelcomeHandler());
+        server.createContext("/index.html", new WelcomeHandler());
+        server.createContext("/CA1.jar", new WelcomeHandler());
         server.createContext("/headers", new HeadersHandler());
         server.createContext("/pages", new FilesHandler());
         server.createContext("/status", new OnlineUsersHandler());
@@ -44,45 +46,59 @@ public class WebServer
         server.start();
         System.out.println("zee server was started, haha xD");
         System.out.println("bound to " + ip + ", listening on port " + port);
+        ChatServer.getInstance();
     }
 
-    static class WelcomeHandler implements HttpHandler
-    {
+    static class WelcomeHandler implements HttpHandler {
 
         @Override
-        public void handle(HttpExchange he) throws IOException
-        {
-//            String response = "Welcome to my first http server!";
-//            he.   // here we can add more details to the header
-            StringBuilder sb = new StringBuilder();
-            sb.append("<!DOCTYPE html>\n");
-            sb.append("<html>\n");
-            sb.append("<head>\n");
-            sb.append("<title>My fancy Web Site</title>\n");
-            sb.append("<meta charset='UTF-8'>\n");
-            sb.append("</head>\n");
-            sb.append("<body>\n");
-            sb.append("<h2>Welcome to my very first home made Web Server :-)</h2>\n");
-            sb.append("</body>\n");
-            sb.append("</html>\n");
-
-            String response = sb.toString();
+        public void handle(HttpExchange he) throws IOException {
+            //String response = "Welcome to my first http server!";
+            // here we can add more details to the header
+            String requestedFile = he.getRequestURI().toString();
+            String f = requestedFile.substring(requestedFile.lastIndexOf("/") + 1);
+            String extension = f.substring(f.lastIndexOf("."));
+            String mime = "";
+            switch (extension) {
+                case ".pdf":
+                    mime = "application/pdf";
+                    break;
+                case ".png":
+                    mime = "image/png";
+                    break;
+                case ".jpg":
+                    mime = "image/jpg";
+                    break;
+                case ".html":
+                    mime = "text/html";
+                    break;
+                case ".jar":
+                    mime = "application/java-archive";
+                    break;
+            }
+            String contentFolder = "public/";
+            File file = new File(contentFolder + f);
+            byte[] bytesToSend = new byte[(int) file.length()];
+            try {
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+                bis.read(bytesToSend, 0, bytesToSend.length);
+            } catch (IOException ie) {
+                ie.printStackTrace();
+            }
             Headers h = he.getResponseHeaders();
-            h.add("Content-Type", "text/html");
-            he.sendResponseHeaders(200, response.length());
-            try (PrintWriter pw = new PrintWriter(he.getResponseBody()))
-            {
-                pw.print(response);
+            h.add("Content-Type", mime);
+
+            he.sendResponseHeaders(200, bytesToSend.length);
+            try (OutputStream os = he.getResponseBody()) {
+                os.write(bytesToSend, 0, bytesToSend.length);
             }
         }
     }
 
-    static class HeadersHandler implements HttpHandler
-    {
+    static class HeadersHandler implements HttpHandler {
 
         @Override
-        public void handle(HttpExchange he) throws IOException
-        {
+        public void handle(HttpExchange he) throws IOException {
             Map<String, List<String>> map = he.getRequestHeaders();
             StringBuilder sb = new StringBuilder();
             sb.append("<!DOCTYPE html>\n");
@@ -97,8 +113,7 @@ public class WebServer
             sb.append("<td><b>Header</b></td>\n");
             sb.append("<td><b>Value</b></td>\n");
             sb.append("</tr>\n");
-            for (Map.Entry<String, List<String>> entry : map.entrySet())
-            {
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
                 sb.append("<tr>\n");
                 sb.append("<td>").append(entry.getKey()).append("</td>\n");
                 sb.append("<td>").append(entry.getValue()).append("</td>\n");
@@ -113,19 +128,16 @@ public class WebServer
             Headers h = he.getResponseHeaders();
             h.add("Content-Type", "text/html");
             he.sendResponseHeaders(200, response.length());
-            try (PrintWriter pw = new PrintWriter(he.getResponseBody()))
-            {
+            try (PrintWriter pw = new PrintWriter(he.getResponseBody())) {
                 pw.print(response);
             }
         }
     }
 
-    static class FilesHandler implements HttpHandler
-    {
+    static class FilesHandler implements HttpHandler {
 
         @Override
-        public void handle(HttpExchange he) throws IOException
-        {
+        public void handle(HttpExchange he) throws IOException {
             StringBuilder sb = new StringBuilder();
             sb.append("<!DOCTYPE html>\n");
             sb.append("<html>\n");
@@ -142,19 +154,16 @@ public class WebServer
             Headers h = he.getResponseHeaders();
             h.add("Content-Type", "text/html");
             he.sendResponseHeaders(200, response.length());
-            try (PrintWriter pw = new PrintWriter(he.getResponseBody()))
-            {
+            try (PrintWriter pw = new PrintWriter(he.getResponseBody())) {
                 pw.print(response);
             }
         }
     }
 
-    static class OnlineUsersHandler implements HttpHandler
-    {
+    static class OnlineUsersHandler implements HttpHandler {
 
         @Override
-        public void handle(HttpExchange he) throws IOException
-        {
+        public void handle(HttpExchange he) throws IOException {
 //            String response = "Welcome to my first http server!";
 //            he.   // here we can add more details to the header
             StringBuilder sb = new StringBuilder();
@@ -176,8 +185,7 @@ public class WebServer
             Headers h = he.getResponseHeaders();
             h.add("Content-Type", "text/html");
             he.sendResponseHeaders(200, response.length());
-            try (PrintWriter pw = new PrintWriter(he.getResponseBody()))
-            {
+            try (PrintWriter pw = new PrintWriter(he.getResponseBody())) {
                 pw.print(response);
             }
         }
