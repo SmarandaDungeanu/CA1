@@ -31,34 +31,48 @@ public class WebServer
         ip = properties.getProperty("serverIp");
 //        port = Integer.parseInt(properties.getProperty("port"));
 <<<<<<< HEAD
+<<<<<<< HEAD
         port = 80;
 =======
         port = 8080;
 >>>>>>> origin/Smara
+=======
+        port = Integer.parseInt(properties.getProperty("webServerPort"));
+>>>>>>> origin/Marek
 //        String logFile = properties.getProperty("logFile");
 
 //        InetSocketAddress i = new InetSocketAddress("127.0.0.1", 8080);
         InetSocketAddress i = new InetSocketAddress(ip, port);
         HttpServer server = HttpServer.create(i, 0);
 <<<<<<< HEAD
+<<<<<<< HEAD
         server.createContext("/welcome", new WelcomeHandler());
         server.createContext("/headers", new HeadersHandler());
         server.createContext("/pages", new FilesHandler());
 =======
+=======
+>>>>>>> origin/Marek
         server.createContext("/index.html", new WelcomeHandler());
         server.createContext("/CA1.jar", new WelcomeHandler());
         server.createContext("/chatLog.txt", new WelcomeHandler());
         server.createContext("/chatLog", new ChatLogHandler());
+<<<<<<< HEAD
 >>>>>>> origin/Smara
+=======
+>>>>>>> origin/Marek
         server.createContext("/status", new OnlineUsersHandler());
         server.setExecutor(null);
         server.start();
         System.out.println("zee server was started, haha xD");
         System.out.println("bound to " + ip + ", listening on port " + port);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         ChatServer.getInstance().start();
 >>>>>>> origin/Smara
+=======
+        ChatServer.getInstance().start();
+>>>>>>> origin/Marek
     }
 
     static class WelcomeHandler implements HttpHandler
@@ -99,7 +113,11 @@ public class WebServer
                 case ".jar":
                     mime = "application/java-archive";
                     break;
+<<<<<<< HEAD
                 case ".txt":
+=======
+                     case ".txt":
+>>>>>>> origin/Marek
                     mime = "text/plain";
                     break;
             }
@@ -128,8 +146,12 @@ public class WebServer
     }
 <<<<<<< HEAD
 
+<<<<<<< HEAD
     static class HeadersHandler implements HttpHandler
     {
+=======
+    static class ChatLogHandler  implements HttpHandler {
+>>>>>>> origin/Marek
 
         @Override
         public void handle(HttpExchange he) throws IOException
@@ -193,10 +215,14 @@ public class WebServer
             sb.append("<meta charset='UTF-8'>\n");
             sb.append("</head>\n");
             sb.append("<body>\n");
+<<<<<<< HEAD
             sb.append("<h2>Welcome to my very first home made Web Server :-)</h2>\n");
 =======
             sb.append("<h2>This should work, but java...</h2>\n");
 >>>>>>> origin/Smara
+=======
+            sb.append("<h2>This should work, but java...</h2>\n");
+>>>>>>> origin/Marek
             sb.append("</body>\n");
             sb.append("</html>\n");
 

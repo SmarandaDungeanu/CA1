@@ -95,14 +95,12 @@ public class ChatServer
                     {
                         ch.getValue().send(msg);
                     }
-                }
-                else
+                } else
                 {
-                       ch.getValue().send(msg);
+                    ch.getValue().send(msg);
                 }
             }
-        }
-        else
+        } else
         {
             for (String s : recipients)
             {
@@ -124,7 +122,7 @@ public class ChatServer
 
     public void start()
     {
-        int port = Integer.parseInt(properties.getProperty("port"));
+        int port = Integer.parseInt(properties.getProperty("chatProgramPort"));
         String ip = properties.getProperty("serverIp");
         String logFile = properties.getProperty("logFile");
         Utils.setLogFile(logFile, ChatServer.class.getName());
