@@ -31,7 +31,7 @@ public class WebServer {
         Properties properties = Utils.initProperties("server.properties");
         ip = properties.getProperty("serverIp");
 //        port = Integer.parseInt(properties.getProperty("port"));
-        port = 9080;
+        port = 8080;
 //        String logFile = properties.getProperty("logFile");
 
 //        InetSocketAddress i = new InetSocketAddress("127.0.0.1", 8080);
@@ -39,14 +39,14 @@ public class WebServer {
         HttpServer server = HttpServer.create(i, 0);
         server.createContext("/index.html", new WelcomeHandler());
         server.createContext("/CA1.jar", new WelcomeHandler());
-        server.createContext("/headers", new HeadersHandler());
-        server.createContext("/pages", new FilesHandler());
+        server.createContext("/chatLog.txt", new WelcomeHandler());
+        server.createContext("/chatLog", new ChatLogHandler());
         server.createContext("/status", new OnlineUsersHandler());
         server.setExecutor(null);
         server.start();
         System.out.println("zee server was started, haha xD");
         System.out.println("bound to " + ip + ", listening on port " + port);
-        ChatServer.getInstance();
+        ChatServer.getInstance().start();
     }
 
     static class WelcomeHandler implements HttpHandler {
@@ -63,17 +63,14 @@ public class WebServer {
                 case ".pdf":
                     mime = "application/pdf";
                     break;
-                case ".png":
-                    mime = "image/png";
-                    break;
-                case ".jpg":
-                    mime = "image/jpg";
-                    break;
                 case ".html":
                     mime = "text/html";
                     break;
                 case ".jar":
                     mime = "application/java-archive";
+                    break;
+                case ".txt":
+                    mime = "text/plain";
                     break;
             }
             String contentFolder = "public/";
@@ -94,47 +91,8 @@ public class WebServer {
             }
         }
     }
-
-    static class HeadersHandler implements HttpHandler {
-
-        @Override
-        public void handle(HttpExchange he) throws IOException {
-            Map<String, List<String>> map = he.getRequestHeaders();
-            StringBuilder sb = new StringBuilder();
-            sb.append("<!DOCTYPE html>\n");
-            sb.append("<html>\n");
-            sb.append("<head>\n");
-            sb.append("<title>HTTP-headers</title>\n");
-            sb.append("<meta charset='UTF-8'>\n");
-            sb.append("</head>\n");
-            sb.append("<body>\n");
-            sb.append("<table border=\"1\" style=\"width:300px\">\n");
-            sb.append("<tr>\n");
-            sb.append("<td><b>Header</b></td>\n");
-            sb.append("<td><b>Value</b></td>\n");
-            sb.append("</tr>\n");
-            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-                sb.append("<tr>\n");
-                sb.append("<td>").append(entry.getKey()).append("</td>\n");
-                sb.append("<td>").append(entry.getValue()).append("</td>\n");
-                sb.append("</tr>\n");
-            }
-
-            sb.append("</table>\n");
-            sb.append("</body>\n");
-            sb.append("</html>\n");
-
-            String response = sb.toString();
-            Headers h = he.getResponseHeaders();
-            h.add("Content-Type", "text/html");
-            he.sendResponseHeaders(200, response.length());
-            try (PrintWriter pw = new PrintWriter(he.getResponseBody())) {
-                pw.print(response);
-            }
-        }
-    }
-
-    static class FilesHandler implements HttpHandler {
+    
+    static class ChatLogHandler implements HttpHandler {
 
         @Override
         public void handle(HttpExchange he) throws IOException {
@@ -142,11 +100,11 @@ public class WebServer {
             sb.append("<!DOCTYPE html>\n");
             sb.append("<html>\n");
             sb.append("<head>\n");
-            sb.append("<title>My fancy Web Site</title>\n");
+            sb.append("<title>Chat log information</title>\n");
             sb.append("<meta charset='UTF-8'>\n");
             sb.append("</head>\n");
             sb.append("<body>\n");
-            sb.append("<h2>Welcome to my very first home made Web Server :-)</h2>\n");
+            sb.append("<h2>This should work, but java...</h2>\n");
             sb.append("</body>\n");
             sb.append("</html>\n");
 

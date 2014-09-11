@@ -54,6 +54,8 @@ public class ChatClient extends Thread
             notifyListeners(msg);
             msg = input.nextLine();
         }
+        notifyListeners(msg);
+        
         try
         {
             socket.close();

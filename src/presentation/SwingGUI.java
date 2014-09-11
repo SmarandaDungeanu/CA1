@@ -24,8 +24,7 @@ public class SwingGUI extends javax.swing.JFrame implements MessageListener
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
 
         ipLabel = new javax.swing.JLabel();
         ipTextField = new javax.swing.JTextField();
@@ -44,10 +43,8 @@ public class SwingGUI extends javax.swing.JFrame implements MessageListener
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ChatClient");
-        addWindowListener(new java.awt.event.WindowAdapter()
-        {
-            public void windowClosing(java.awt.event.WindowEvent evt)
-            {
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
         });
@@ -58,13 +55,16 @@ public class SwingGUI extends javax.swing.JFrame implements MessageListener
 
         portLabel.setText("Port");
 
-        portTextField.setText("9090");
+        portTextField.setText("9080");
+        portTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                portTextFieldActionPerformed(evt);
+            }
+        });
 
         connectButton.setText("Connect");
-        connectButton.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        connectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 connectButtonActionPerformed(evt);
             }
         });
@@ -78,19 +78,15 @@ public class SwingGUI extends javax.swing.JFrame implements MessageListener
 
         jScrollPane2.setViewportView(usersList);
 
-        messageTextField.addKeyListener(new java.awt.event.KeyAdapter()
-        {
-            public void keyPressed(java.awt.event.KeyEvent evt)
-            {
+        messageTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
                 messageTextFieldKeyPressed(evt);
             }
         });
 
         sendButton.setText("Send");
-        sendButton.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        sendButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sendButtonActionPerformed(evt);
             }
         });
@@ -214,6 +210,10 @@ public class SwingGUI extends javax.swing.JFrame implements MessageListener
     {//GEN-HEADEREND:event_formWindowClosing
         client.unRegisterEchoListener(this);
     }//GEN-LAST:event_formWindowClosing
+
+    private void portTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_portTextFieldActionPerformed
 
     /**
      * @param args the command line arguments
